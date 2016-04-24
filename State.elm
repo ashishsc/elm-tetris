@@ -12,6 +12,7 @@ import Time exposing (Time)
 
 type alias State =
   { falling : Tetromino
+  , score : Int
   , seed : Seed
   , bag : List Tetromino
   , board : Board
@@ -19,6 +20,11 @@ type alias State =
   , nextShift : Time
   , shiftDelay : Time
   }
+
+
+scoreMultiplier : Int
+scoreMultiplier =
+  10
 
 
 initialSeed : Int
@@ -39,6 +45,7 @@ defaultState =
       List.drop 1 bag
   in
     { falling = Tetromino.shift startingShift falling
+    , score = 0
     , seed = seed
     , bag = bag'
     , board = Board.new []
@@ -68,6 +75,9 @@ view state =
     collage screenWidth screenHeight [ boardForm ]
 
 
+{-| Update the state's bag with a new bag if it is empty
+otherwise, just return the existing bag
+-}
 checkBag : State -> State
 checkBag state =
   if not (List.isEmpty state.bag) then
@@ -99,8 +109,19 @@ nextTetromino state =
 
     ( lines, nextBoard ) =
       Board.addTetromino state'.falling state'.board |> Board.clearLines
+
+    nextScore =
+      if lines > 0 then
+        lines * scoreMultiplier + state'.score
+      else
+        state.score
   in
-    { state' | falling = nextFalling, bag = nextBag, board = nextBoard }
+    { state'
+      | falling = nextFalling
+      , bag = nextBag
+      , board = nextBoard
+      , score = nextScore
+    }
 
 
 {-| if it is time to do a shift, shift the piece down and update the
@@ -131,6 +152,9 @@ checkTick state =
       { state' | nextShift = nextShift }
 
 
+{-| check to see if the given state is valid,
+if it is return it, otherise return the old state
+-}
 useIfValid : State -> State -> State
 useIfValid current new =
   if Board.isValid new.falling new.board then
