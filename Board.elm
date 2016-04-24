@@ -151,6 +151,9 @@ clearRow row board =
     Dict.foldr shift Dict.empty board
 
 
+{-| return number of lines cleared and the new board if
+we have have cleared any
+-}
 clearLines : Board -> ( Int, Board )
 clearLines =
   let
