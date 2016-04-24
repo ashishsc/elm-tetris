@@ -15,6 +15,12 @@ type alias Location =
 type alias Tetromino =
   { shape : List Location
   , block : Block
+  , pivot :
+      { r : Float
+      , c : Float
+      }
+  , rows : Int
+  , cols : Int
   }
 
 
@@ -46,6 +52,9 @@ i =
       , ( -2, 0 )
       ]
   , block = Block Color.lightBlue
+  , pivot = { r = -0.5, c = 0.5 }
+  , rows = 4
+  , cols = 1
   }
 
 
@@ -58,14 +67,66 @@ j =
       , ( -1, 0 )
       ]
   , block = Block Color.blue
+  , pivot = { r = 0, c = 0 }
+  , rows = 3
+  , cols = 2
   }
+
+
+drawPivot : Tetromino -> Form
+drawPivot { pivot } =
+  let
+    dot =
+      circle 5 |> filled Color.black
+
+    translate =
+      move ( pivot.c * Block.size, pivot.r * Block.size )
+  in
+    translate dot
+
+
+rotateLocation : { r : Float, c : Float } -> Float -> Location -> Location
+rotateLocation pivot angle ( row, col ) =
+  let
+    rowOrigin =
+      (toFloat row) - pivot.r
+
+    colOrigin =
+      (toFloat col) - pivot.c
+
+    ( s, c ) =
+      ( sin (angle), cos (angle) )
+
+    rowRotated =
+      rowOrigin * c - colOrigin * s
+
+    colRotated =
+      rowOrigin * s + colOrigin * c
+  in
+    ( round <| rowRotated + pivot.r, round <| colRotated + pivot.c )
+
+
+rotate : Tetromino -> Tetromino
+rotate tetromino =
+  let
+    rotateHelper =
+      rotateLocation tetromino.pivot (degrees 90)
+
+    newShape =
+      List.map rotateHelper tetromino.shape
+  in
+    { tetromino
+      | shape = newShape
+      , rows = tetromino.cols
+      , cols = tetromino.rows
+    }
 
 
 tetromino : Tetromino
 tetromino =
-  j
+  rotate j
 
 
 main : Element
 main =
-  collage 400 400 [ toForm tetromino ]
+  collage 400 400 [ toForm tetromino, drawPivot tetromino ]
