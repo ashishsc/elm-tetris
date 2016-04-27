@@ -4,6 +4,7 @@ import Block exposing (Block)
 import Color exposing (Color)
 import Graphics.Element exposing (..)
 import Graphics.Collage exposing (..)
+import Random exposing (Generator)
 
 
 {-| row, col
@@ -222,6 +223,44 @@ tetromino =
   shift ( -3, 0 ) o
 
 
+zeroToOne : Generator Float
+zeroToOne =
+  Random.float 0 1
+
+
+bag : Generator (List Tetromino)
+bag =
+  let
+    -- generate 7 random numbers
+    weights =
+      Random.list 7 zeroToOne
+  in
+    Random.map shuffleBag weights
+
+
+{-| returns a list of tetrominos based
+on the weights assigned, highest weights returned
+first
+-}
+shuffleBag : List Float -> List Tetromino
+shuffleBag weights =
+  let
+    tetrominoes =
+      [ i, o, j, l, z, s, t ]
+
+    weighted =
+      List.map2 (,) weights tetrominoes
+
+    sorted =
+      List.sortBy fst weighted
+  in
+    List.map snd sorted
+
+
 main : Element
 main =
-  collage 400 400 [ toForm tetromino, drawPivot tetromino ]
+  Random.generate bag (Random.initialSeed 43)
+    |> fst
+    |> List.map toForm
+    |> List.map (\f -> collage 80 80 [ f ])
+    |> flow right
