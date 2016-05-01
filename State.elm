@@ -67,8 +67,11 @@ view state =
 
     boardForm =
       Board.addTetromino state.falling state.board |> Board.toForm
+
+    scoreForm =
+      Score.toForm state.score
   in
-    collage screenWidth screenHeight [ boardForm ]
+    collage screenWidth screenHeight [ boardForm, scoreForm ]
 
 
 {-| Update the state's bag with a new bag if it is empty
