@@ -15,6 +15,16 @@ size =
   70
 
 
+scoreMultiplier : Int
+scoreMultiplier =
+  10
+
+
+calculate : Int -> Score -> Score
+calculate linesCleared oldScore =
+  linesCleared * scoreMultiplier + oldScore
+
+
 scoreTextStyle : Text.Style
 scoreTextStyle =
   let

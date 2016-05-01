@@ -8,11 +8,12 @@ import Random exposing (Generator, Seed)
 import Signal exposing (Signal)
 import Tetromino exposing (Tetromino)
 import Time exposing (Time)
+import Score exposing (Score)
 
 
 type alias State =
   { falling : Tetromino
-  , score : Int
+  , score : Score
   , seed : Seed
   , bag : List Tetromino
   , board : Board
@@ -20,11 +21,6 @@ type alias State =
   , nextShift : Time
   , shiftDelay : Time
   }
-
-
-scoreMultiplier : Int
-scoreMultiplier =
-  10
 
 
 initialSeed : Int
@@ -111,10 +107,7 @@ nextTetromino state =
       Board.addTetromino state'.falling state'.board |> Board.clearLines
 
     nextScore =
-      if lines > 0 then
-        lines * scoreMultiplier + state'.score
-      else
-        state.score
+      Score.calculate lines state'.score
   in
     { state'
       | falling = nextFalling
