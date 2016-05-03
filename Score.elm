@@ -31,14 +31,14 @@ scoreTextStyle =
     def =
       Text.defaultStyle
   in
-    { def | color = Color.yellow }
+    { def | color = Color.white }
 
 
 toForm : Score -> Form
 toForm score =
   let
     shape =
-      outlined (solid Color.red) (square size)
+      filled Color.black (square size)
 
     scoreForm =
       score |> toString |> Text.fromString |> Text.style scoreTextStyle |> text

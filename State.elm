@@ -69,7 +69,7 @@ view state =
       Board.addTetromino state.falling state.board |> Board.toForm
 
     scoreForm =
-      Score.toForm state.score
+      Score.toForm state.score |> move ( -160, 215 )
   in
     collage screenWidth screenHeight [ boardForm, scoreForm ]
 
