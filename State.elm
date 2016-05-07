@@ -28,6 +28,16 @@ initialSeed =
   42
 
 
+shiftDt : Time
+shiftDt =
+  Time.millisecond * 100
+
+
+maxSpeed : Time
+maxSpeed =
+  Time.millisecond * 100
+
+
 defaultState : State
 defaultState =
   let
@@ -111,12 +121,23 @@ nextTetromino state =
 
     nextScore =
       Score.calculate lines state'.score
+
+    shorterDelay =
+      state.shiftDelay - shiftDt
+
+    -- If the user has scored, ramp up until we hit maximum difficulty
+    nextShiftDelay =
+      if (state.score == nextScore) || (shorterDelay <= maxSpeed) then
+        state.shiftDelay
+      else
+        shorterDelay
   in
     { state'
       | falling = nextFalling
       , bag = nextBag
       , board = nextBoard
       , score = nextScore
+      , shiftDelay = nextShiftDelay
     }
 
 
