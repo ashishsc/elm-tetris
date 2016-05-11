@@ -1,37 +1,42 @@
-module Controller (..) where
+module Controller exposing (..)
 
-import Graphics.Element exposing (Element, show)
-import Keyboard exposing (arrows)
-import Signal exposing (Signal)
-import Time exposing (Time, fps)
+import AnimationFrame
+import Keyboard
+import Time exposing (Time)
 
 
-type Input
+type Msg
   = Rotate
   | Shift ( Int, Int )
   | Tick Time
+  | NoOp -- user pressed an unsupported key
 
 
-arrowsToInput : { x : Int, y : Int } -> Input
-arrowsToInput { x, y } =
-  if (y == 1) then
+keyCodeToMsg : Keyboard.KeyCode -> Msg
+keyCodeToMsg keyCode =
+  case keyCode of
+  -- down
+  40 ->
+    Shift (-1, 0)
+  -- left
+  37 ->
+    Shift ( 0, -1 ) -- is this backwards?
+  -- right
+  39 ->
+    Shift ( 0, 1 ) -- is this backwards?
+  -- up
+  38 ->
     Rotate
-  else
-    Shift ( y, x )
+  _ ->
+    NoOp
 
-
-inputs : Signal Input
-inputs =
+subscriptions : Sub Msg
+subscriptions =
   let
     ticks =
-      Signal.map Tick (fps 30)
+      AnimationFrame.diffs Tick
 
     keys =
-      Signal.map arrowsToInput arrows
+      Keyboard.downs keyCodeToMsg
   in
-    Signal.merge ticks keys
-
-
-main : Signal Element
-main =
-  Signal.map show inputs
+    Sub.batch [ ticks, keys ]

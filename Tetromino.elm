@@ -1,9 +1,8 @@
-module Tetromino (..) where
+module Tetromino exposing (..)
 
 import Block exposing (Block)
 import Color exposing (Color)
-import Graphics.Element exposing (..)
-import Graphics.Collage exposing (..)
+import Collage exposing (..)
 import Random exposing (Generator)
 
 
@@ -255,12 +254,3 @@ shuffleBag weights =
       List.sortBy fst weighted
   in
     List.map snd sorted
-
-
-main : Element
-main =
-  Random.generate bag (Random.initialSeed 43)
-    |> fst
-    |> List.map toForm
-    |> List.map (\f -> collage 80 80 [ f ])
-    |> flow right

@@ -1,8 +1,7 @@
-module Block (..) where
+module Block exposing (..)
 
 import Color exposing (Color)
-import Graphics.Element exposing (..)
-import Graphics.Collage exposing (..)
+import Collage exposing (..)
 
 
 type alias Block =
@@ -24,8 +23,3 @@ toForm block =
       outlined (solid Color.black) shape
   in
     group [ filled block.color shape, border ]
-
-
-main : Element
-main =
-  collage 400 400 [ toForm (Block Color.blue) ]
