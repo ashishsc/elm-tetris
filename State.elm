@@ -1,14 +1,15 @@
-module State (..) where
+module State exposing (..)
 
 import Board exposing (Board)
-import Controller exposing (..)
-import Graphics.Collage exposing (..)
-import Graphics.Element exposing (Element)
+import Controller exposing (Msg(..), subscriptions)
+import Collage exposing (..)
+import Element exposing (Element)
 import Random exposing (Generator, Seed)
-import Signal exposing (Signal)
 import Tetromino exposing (Tetromino)
 import Time exposing (Time)
 import Score exposing (Score)
+import Html.App as App
+import Html exposing (Html)
 
 
 type alias State =
@@ -38,11 +39,11 @@ maxSpeed =
   Time.millisecond * 100
 
 
-defaultState : State
-defaultState =
+init : (State, Cmd Msg)
+init =
   let
     ( bag, seed ) =
-      Random.generate Tetromino.bag (Random.initialSeed initialSeed)
+      Random.step Tetromino.bag (Random.initialSeed initialSeed)
 
     falling =
       List.head bag |> Maybe.withDefault Tetromino.i
@@ -50,7 +51,7 @@ defaultState =
     bag' =
       List.drop 1 bag
   in
-    { falling = Tetromino.shift startingShift falling
+    ({ falling = Tetromino.shift startingShift falling
     , score = 0
     , seed = seed
     , bag = bag'
@@ -58,7 +59,7 @@ defaultState =
     , time = 0
     , nextShift = Time.second
     , shiftDelay = Time.second
-    }
+    }, Cmd.none)
 
 
 startingShift : ( Int, Int )
@@ -66,7 +67,7 @@ startingShift =
   ( 20, 5 )
 
 
-view : State -> Element
+view : State -> Html Msg
 view state =
   let
     screenWidth =
@@ -82,6 +83,7 @@ view state =
       Score.toForm state.score |> move ( -160, 215 )
   in
     collage screenWidth screenHeight [ boardForm, scoreForm ]
+      |> Element.toHtml
 
 
 {-| Update the state's bag with a new bag if it is empty
@@ -94,7 +96,7 @@ checkBag state =
   else
     let
       ( bag, seed ) =
-        Random.generate Tetromino.bag state.seed
+        Random.step Tetromino.bag state.seed
     in
       { state | bag = bag, seed = seed }
 
@@ -223,7 +225,7 @@ floorKick current nextState =
     tryKicks shifts current nextState
 
 
-update : Input -> State -> State
+update : Msg -> State -> (State, Cmd Msg)
 update input state =
   let
     useIfValid' =
@@ -253,27 +255,33 @@ update input state =
             else
               nextState'
         in
-          nextState''
+          (nextState'', Cmd.none)
 
       Shift amount ->
-        useIfValid'
-          { state
+        let nextState =
+          useIfValid' { state
             | falling = Tetromino.shift amount state.falling
           }
+        in
+          (nextState, Cmd.none)
 
       Tick delta ->
-        useIfValid'
-          <| checkTick
-              { state
-                | time = state.time + delta
-              }
+        let nextState =
+          useIfValid'
+            <| checkTick
+                { state
+                  | time = state.time + delta
+                }
+        in
+          (nextState, Cmd.none)
+      NoOp ->
+        (state, Cmd.none)
 
-
-states : Signal State
-states =
-  Signal.foldp update defaultState inputs
-
-
-main : Signal Element
+main : Program Never
 main =
-  Signal.map view states
+  App.program
+    { init = init
+    , update = update
+    , view = view
+    , subscriptions = \_ -> subscriptions
+    }

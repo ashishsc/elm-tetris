@@ -1,8 +1,7 @@
-module Score (..) where
+module Score exposing (..)
 
 import Color exposing (Color)
-import Graphics.Element exposing (Element)
-import Graphics.Collage exposing (..)
+import Collage exposing (..)
 import Text
 
 
@@ -44,8 +43,3 @@ toForm score =
       score |> toString |> Text.fromString |> Text.style scoreTextStyle |> text
   in
     group [ shape, scoreForm ]
-
-
-main : Element
-main =
-  collage 400 400 [ toForm 20 ]

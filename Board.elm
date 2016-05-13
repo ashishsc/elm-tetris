@@ -1,10 +1,9 @@
-module Board (..) where
+module Board exposing (..)
 
 import Block exposing (Block)
 import Color
 import Dict exposing (Dict)
-import Graphics.Collage exposing (..)
-import Graphics.Element exposing (down, flow, show)
+import Collage exposing (..)
 import Tetromino exposing (Tetromino, Location)
 
 
@@ -208,17 +207,3 @@ isValid tetromino board =
 tetromino : Tetromino
 tetromino =
   Tetromino.shift ( 0, 5 ) Tetromino.j
-
-
-test : Board
-test =
-  new []
-
-
-main : Graphics.Element.Element
-main =
-  flow
-    down
-    [ collage 600 600 [ toForm (addTetromino tetromino test) ]
-    , show <| isValid tetromino test
-    ]
