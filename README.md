@@ -7,8 +7,11 @@ Inspired by the tutorial of jscollard [here](https://www.youtube.com/watch?v=GMS
 Just run elm-make or use the elm-reactor
 
 Future work
-* Preview of block position
-* Hard drop
-* Preview of next shape(s)
-* Music
-* MAYBE Multiplayer (Websocket?)
+- [ ] Game Over and ability to restart
+- [ ] Scale viewport
+- [ ] Touch Controls
+- [ ] Preview of block position
+- [ ] Hard drop
+- [ ] Preview of next shape(s)
+- [ ] Music
+- [ ] MAYBE Multiplayer (Websocket?)
