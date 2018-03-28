@@ -1,4 +1,4 @@
-module State exposing (..)
+module Main exposing (..)
 
 import Board exposing (Board)
 import Collage exposing (..)
