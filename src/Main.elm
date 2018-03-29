@@ -1,19 +1,25 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Board exposing (Board)
 import Collage exposing (..)
 import Controller exposing (Msg(..), subscriptions)
 import Element exposing (Element)
 import Html exposing (Html)
+import Html.Attributes as Attrs
+import Html.Events exposing (onClick)
 import Random exposing (Generator, Seed)
 import Score exposing (Score)
 import Tetromino exposing (Tetromino)
 import Time exposing (Time)
 
 
+port toggleMusic : Bool -> Cmd msg
+
+
 type alias State =
     { falling : Tetromino
     , score : Score
+    , musicEnabled : Bool
     , seed : Seed
     , bag : List Tetromino
     , board : Board
@@ -52,6 +58,7 @@ init =
     in
     ( { falling = Tetromino.shift startingShift falling
       , score = 0
+      , musicEnabled = True
       , seed = seed
       , bag = bag_
       , board = Board.new []
@@ -82,9 +89,35 @@ view state =
 
         scoreForm =
             Score.toForm state.score |> move ( -160, 215 )
+
+        music =
+            let
+                unicodeIcon =
+                    if state.musicEnabled then
+                        "🔊"
+                    else
+                        "🔇"
+            in
+            Html.div [ Attrs.class "music" ]
+                [ Html.button
+                    [ onClick ToggleMusic
+                    , Attrs.classList [ ( "muted", not state.musicEnabled ) ]
+                    ]
+                    [ Html.text ("Toggle Music " ++ unicodeIcon) ]
+                , Html.audio
+                    [ Attrs.autoplay True
+                    , Attrs.src "tetris.mp3"
+                    , Attrs.loop True
+                    , Attrs.id "music"
+                    ]
+                    []
+                ]
+
+        gameView =
+            collage screenWidth screenHeight [ boardForm, scoreForm ]
+                |> Element.toHtml
     in
-    collage screenWidth screenHeight [ boardForm, scoreForm ]
-        |> Element.toHtml
+    Html.div [] [ music, gameView ]
 
 
 {-| Update the state's bag with a new bag if it is empty
@@ -278,6 +311,9 @@ update input state =
                             }
             in
             ( nextState, Cmd.none )
+
+        ToggleMusic ->
+            ( { state | musicEnabled = not state.musicEnabled }, toggleMusic state.musicEnabled )
 
         NoOp ->
             ( state, Cmd.none )
