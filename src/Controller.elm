@@ -9,6 +9,7 @@ type Msg
     = Rotate
     | Shift ( Int, Int )
     | Tick Time
+    | ToggleMusic
     | NoOp -- user pressed an unsupported key
 
 
