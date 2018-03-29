@@ -1,9 +1,12 @@
 {
     "version": "1.0.0",
     "summary": "helpful summary of your project, less than 80 characters",
+    "homepage": "ashishs.site/elm-tetris",
     "repository": "https://github.com/user/project.git",
     "license": "BSD3",
-    "source-directories": [ "src" ],
+    "source-directories": [
+        "src"
+    ],
     "exposed-modules": [],
     "dependencies": {
         "elm-lang/animation-frame": "1.0.1 <= v < 2.0.0",
